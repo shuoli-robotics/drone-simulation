@@ -61,7 +61,7 @@ class DroneControlSim:
             self.time[self.pointer] = self.pointer * self.sim_step
             psi_cmd = 0.0
             
-            self.position_cmd[self.pointer] = [0,0,-1]
+            self.position_cmd[self.pointer] = [1,0,-1.5]
             self.velocity_cmd[self.pointer] = self.position_controller(self.position_cmd[self.pointer])
 
             
@@ -77,6 +77,7 @@ class DroneControlSim:
             # thrust_cmd = -10 * self.m
 
             self.drone_states[self.pointer+1] = self.drone_states[self.pointer] + self.sim_step*self.drone_dynamics(thrust_cmd,M)
+        self.time[-1] = self.sim_time
 
 
 
@@ -115,24 +116,54 @@ class DroneControlSim:
 
     def plot_states(self):
         fig1, ax1 = plt.subplots(4,3)
-        ax1[0,0].plot(self.time,self.drone_states[:,0])
+        self.position_cmd[-1] = self.position_cmd[-2]
+        ax1[0,0].plot(self.time,self.drone_states[:,0],label='real')
+        ax1[0,0].plot(self.time,self.position_cmd[:,0],label='cmd')
+        ax1[0,0].set_ylabel('x[m]')
         ax1[0,1].plot(self.time,self.drone_states[:,1])
+        ax1[0,1].plot(self.time,self.position_cmd[:,1])
+        ax1[0,1].set_ylabel('y[m]')
         ax1[0,2].plot(self.time,self.drone_states[:,2])
+        ax1[0,2].plot(self.time,self.position_cmd[:,2])
+        ax1[0,2].set_ylabel('z[m]')
+        ax1[0,0].legend()
 
+        self.velocity_cmd[-1] = self.velocity_cmd[-2]
         ax1[1,0].plot(self.time,self.drone_states[:,3])
+        ax1[1,0].plot(self.time,self.velocity_cmd[:,0])
+        ax1[1,0].set_ylabel('vx[m/s]')
         ax1[1,1].plot(self.time,self.drone_states[:,4])
+        ax1[1,1].plot(self.time,self.velocity_cmd[:,1])
+        ax1[1,1].set_ylabel('vy[m/s]')
         ax1[1,2].plot(self.time,self.drone_states[:,5])
+        ax1[1,2].plot(self.time,self.velocity_cmd[:,2])
+        ax1[1,2].set_ylabel('vz[m/s]')
 
+        self.attitude_cmd[-1] = self.attitude_cmd[-2]
         ax1[2,0].plot(self.time,self.drone_states[:,6])
+        ax1[2,0].plot(self.time,self.attitude_cmd[:,0])
+        ax1[2,0].set_ylabel('phi[rad]')
         ax1[2,1].plot(self.time,self.drone_states[:,7])
+        ax1[2,1].plot(self.time,self.attitude_cmd[:,1])
+        ax1[2,1].set_ylabel('theta[rad]')
         ax1[2,2].plot(self.time,self.drone_states[:,8])
+        ax1[2,2].plot(self.time,self.attitude_cmd[:,2])
+        ax1[2,2].set_ylabel('psi[rad]')
 
+        self.rate_cmd[-1] = self.rate_cmd[-2]
         ax1[3,0].plot(self.time,self.drone_states[:,9])
+        ax1[3,0].plot(self.time,self.rate_cmd[:,0])
+        ax1[3,0].set_ylabel('p[rad/s]')
         ax1[3,1].plot(self.time,self.drone_states[:,10])
+        ax1[3,1].plot(self.time,self.rate_cmd[:,1])
+        ax1[3,0].set_ylabel('q[rad/s]')
         ax1[3,2].plot(self.time,self.drone_states[:,11])
+        ax1[3,2].plot(self.time,self.rate_cmd[:,2])
+        ax1[3,0].set_ylabel('r[rad/s]')
 
 if __name__ == "__main__":
     drone = DroneControlSim()
     drone.run()
     drone.plot_states()
     plt.show()
+    
